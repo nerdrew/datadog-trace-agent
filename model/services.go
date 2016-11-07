@@ -27,7 +27,7 @@ func EncodeServicesPayload(sm ServicesMetadata) ([]byte, error) {
 // ServicesPayloadAPIPath returns the path to append to the URL to get
 // the endpoint for submitting a services metadata payload.
 func ServicesPayloadAPIPath() string {
-	return fmt.Sprintf("/api/%s/services", GlobalAgentPayloadVersion)
+	return fmt.Sprintf("/api/%s/trace/services", AgentPayloadV1)
 }
 
 // SetServicesPayloadHeaders takes a Header struct and adds the appropriate

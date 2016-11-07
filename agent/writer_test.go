@@ -66,7 +66,7 @@ receivingLoop:
 	for {
 		select {
 		case received := <-data:
-			assert.Equal("/api/v0.1/services", received.urlPath)
+			assert.Equal("/api/v1/trace/services", received.urlPath)
 			assert.Equal(map[string][]string{
 				"api_key": []string{"xxxxxxx"},
 			}, received.urlParams)
@@ -130,7 +130,7 @@ receivingLoop:
 	for {
 		select {
 		case received := <-data:
-			assert.Equal("/api/v0.1/collector", received.urlPath)
+			assert.Equal("/api/v1/trace/intake", received.urlPath)
 			assert.Equal(map[string][]string{
 				"api_key": []string{"xxxxxxx"},
 			}, received.urlParams)

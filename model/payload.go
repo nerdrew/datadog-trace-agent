@@ -30,6 +30,7 @@ type AgentPayloadVersion string
 const (
 	// AgentPayloadV01 is a simple json'd/gzip'd dump of the payload
 	AgentPayloadV01 AgentPayloadVersion = "v0.1"
+	AgentPayloadV1  AgentPayloadVersion = "v1"
 )
 
 var (
@@ -60,7 +61,7 @@ func EncodeAgentPayload(p AgentPayload) ([]byte, error) {
 // the payload should be sent to be understood by the API given the
 // configured payload version.
 func AgentPayloadAPIPath() string {
-	return fmt.Sprintf("/api/%s/collector", GlobalAgentPayloadVersion)
+	return fmt.Sprintf("/api/%s/trace/intake", AgentPayloadV1)
 }
 
 // SetAgentPayloadHeaders takes a Header struct and adds the appropriate
