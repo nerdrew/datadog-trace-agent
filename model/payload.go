@@ -30,6 +30,8 @@ type AgentPayloadVersion string
 const (
 	// AgentPayloadV01 is a simple json'd/gzip'd dump of the payload
 	AgentPayloadV01 AgentPayloadVersion = "v0.1"
+	
+        // AgentPayloadV1 is also a simple json'd/gzip'd dump of the payload
 	AgentPayloadV1  AgentPayloadVersion = "v1"
 )
 
