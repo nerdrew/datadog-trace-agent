@@ -5,9 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"math/rand"
-	_ "net/http/pprof" // register debugger
+	"net/http"
 	"os"
 	"os/signal"
+	"runtime/pprof"
 	"strings"
 	"syscall"
 	"time"
@@ -15,6 +16,9 @@ import (
 	"github.com/DataDog/raclette/config"
 	"github.com/DataDog/raclette/statsd"
 	log "github.com/cihub/seelog"
+
+	_ "expvar"
+	_ "net/http/pprof"
 )
 
 // handleSignal closes a channel to exit cleanly from routines
@@ -72,12 +76,34 @@ func versionString() string {
 
 // main is the entrypoint of our code
 func main() {
+	// command-line arguments
 	flag.StringVar(&opts.ddConfigFile, "ddconfig", "/etc/dd-agent/datadog.conf", "Classic agent config file location")
 	// FIXME: merge all APM configuration into dd-agent/datadog.conf and deprecate the below flag
 	flag.StringVar(&opts.configFile, "config", "/etc/datadog/trace-agent.ini", "Trace agent ini config file.")
 	flag.BoolVar(&opts.debug, "debug", false, "Turn on debug mode")
 	flag.BoolVar(&opts.version, "version", false, "Show version information and exit")
+
+	// profiling arguments
+	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	goexpvar := flag.Bool("goexpvar", false, "enable a go_expvar debugger on :8888")
 	flag.Parse()
+
+	// go_expvar for the local agent
+	if *goexpvar == true {
+		log.Info("Enabled go_expvar endpoint at :8888")
+		go http.ListenAndServe(":8888", http.DefaultServeMux)
+	}
+
+	// start CPU profiling
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Critical(err)
+		}
+		pprof.StartCPUProfile(f)
+		log.Info("CPU profiling started...")
+		defer pprof.StopCPUProfile()
+	}
 
 	if opts.version {
 		fmt.Print(versionString())
