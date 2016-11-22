@@ -30,7 +30,7 @@ docker build -f Dockerfile_apm . -t dd_trace_agent
 Set your api key and bind the trace agent to the default route via environment variables
 
 ```
-docker run --name dd_trace_agent -d -e DD_API_KEY=my_api_key -e DD_BIND_HOST=0.0.0.0 dd_trace_agent
+docker run --name dd_trace_agent -d -p 7777:7777 -e DD_API_KEY=my_api_key -e DD_BIND_HOST=0.0.0.0 dd_trace_agent
 ```
 
 The agent accepts a few other configuration values from the environment. See General Configuration for more details
