@@ -42,7 +42,7 @@ After installing one of our integrations `docker logs -f dd_trace_agent` should 
 
 ## Reporting to the agent on the host from an application within a container
 One can either:
-- Run your container with `--net=host`.
+- Run your container with `--net=host`. This has security caveats as described in the [Docker documentation](https://docs.docker.com/engine/reference/run/#/network-settings)
 - Bind the agent to the host's address on the `docker0` bridge. `sudo ip addr show docker0` should give you this.
 E.g.
 ```
@@ -67,6 +67,18 @@ This assumes that the Docker host's own IP address on `docker0` is configured as
 (this is the case in vanilla setups. if you've tweaked this, you know what you're doing :))
 
 An example in python;
+```
+from ddtrace import tracer; tracer.configure(hostname="172.17.0.1")
+```
+
+## Reporting to the agent container from another container
+Start the agent container with
+
+```
+docker run --name dd_trace_agent -d -p 7777:7777 -e DD_API_KEY=my_api_key -e DD_BIND_HOST=0.0.0.0 dd_trace_agent
+```
+
+And then configure your application tracer to point to the Docker host's own IP address on `docker0` - just as mentioned in the previous section
 ```
 from ddtrace import tracer; tracer.configure(hostname="172.17.0.1")
 ```
