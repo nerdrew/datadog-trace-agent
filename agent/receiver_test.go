@@ -416,3 +416,41 @@ func BenchmarkDecoderMsgpack(b *testing.B) {
 		_ = decoder.Decode(&spans)
 	}
 }
+
+func BenchmarkHandleTraces(b *testing.B) {
+	assert := assert.New(b)
+	// send traces to that endpoint using the msgpack content-type
+	var data []byte
+	var mh codec.MsgpackHandle
+	enc := codec.NewEncoderBytes(&data, &mh)
+	err := enc.Encode(getTestTrace(1, 1))
+	assert.Nil(err)
+
+	// prepare the receiver
+	config := config.NewDefaultAgentConfig()
+	receiver := NewHTTPReceiver(config)
+
+	// response recorder
+	handler := http.HandlerFunc(httpHandleWithVersion(v03, receiver.handleTraces))
+
+	// benchmark
+	b.ResetTimer()
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		b.StopTimer()
+		// consume the traces channel without doing anything
+		select {
+		case <-receiver.traces:
+		default:
+		}
+
+		// forge the request
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest("POST", "/v0.3/traces", bytes.NewReader(data))
+		req.Header.Set("Content-Type", "application/msgpack")
+
+		// trace only this execution
+		b.StartTimer()
+		handler.ServeHTTP(rr, req)
+	}
+}
