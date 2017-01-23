@@ -34,9 +34,8 @@ var opts struct {
 	services string
 }
 
-func makeTracesBuffers(tracesPath string) ([][]byte, error) {
-	var traces []model.Trace
-	var buffers [][]byte
+func makeTraces(tracesPath string) ([][]model.Trace, error) {
+	var payloads [][]model.Trace
 	buf := make([]byte, bufferSize)
 
 	tracesFile, tracesErr := os.Open(tracesPath)
@@ -55,6 +54,7 @@ func makeTracesBuffers(tracesPath string) ([][]byte, error) {
 	nbSpans := 0
 	nbBytes := 0
 	for scanner.Scan() {
+		var traces []model.Trace
 		nbPayloads++
 		inBuf := bytes.NewReader(scanner.Bytes())
 		dec := json.NewDecoder(inBuf)
@@ -67,6 +67,7 @@ func makeTracesBuffers(tracesPath string) ([][]byte, error) {
 		for _, trace := range traces {
 			nbSpans += len(trace)
 		}
+		payloads = append(payloads, traces)
 		outBuf := &bytes.Buffer{}
 		encoder := codec.NewEncoder(outBuf, &mh)
 		err = encoder.Encode(traces)
@@ -74,20 +75,37 @@ func makeTracesBuffers(tracesPath string) ([][]byte, error) {
 			log.Fatalf("unable to encode %s:%d\n", traces, nbPayloads)
 			return nil, err
 		}
+		// this is approximate because we will re-encode later as data might change,
+		// but it gives a good idea of the data anyway.
 		nbBytes += outBuf.Len()
-		buffers = append(buffers, outBuf.Bytes())
 	}
 	log.Printf("traces: %d payloads %d traces %d spans %d bytes", nbPayloads, nbTraces, nbSpans, nbBytes)
-	return buffers, nil
+	return payloads, nil
 }
 
-func sendTraces(client *http.Client, buffers [][]byte) error {
-
+func sendTraces(client *http.Client, payloads [][]model.Trace) error {
 	sent := 0
-	for _, buffer := range buffers {
-		req, _ := http.NewRequest("POST", tracesEndPoint, bytes.NewReader(buffer))
+	outBuf := &bytes.Buffer{}
+	encoder := codec.NewEncoder(outBuf, &mh)
+	for i, payload := range payloads {
+		var err error
+		for j, trace := range payload {
+			for k, span := range trace {
+				span.Start = time.Now().UTC().UnixNano() - span.Duration
+				trace[k] = span
+			}
+			payload[j] = trace
+		}
+		outBuf.Reset()
+		err = encoder.Encode(payload)
+		if err != nil {
+			log.Fatalf("unable to encode %v:%d\n", payload, i)
+			return err
+		}
+
+		req, _ := http.NewRequest("POST", tracesEndPoint, bytes.NewReader(outBuf.Bytes()))
 		req.Header.Set("Content-Type", "application/msgpack")
-		_, err := client.Do(req)
+		_, err = client.Do(req)
 		if err != nil {
 			log.Printf("client error: %v\n", err)
 			continue
@@ -96,7 +114,7 @@ func sendTraces(client *http.Client, buffers [][]byte) error {
 
 		time.Sleep(tracesDuration)
 	}
-	log.Printf("traces: sent %d/%d payloads", sent, len(buffers))
+	log.Printf("traces: sent %d/%d payloads", sent, len(payloads))
 
 	return nil
 }
@@ -163,11 +181,11 @@ func main() {
 	}
 
 	go func() {
-		buffers, _ := makeTracesBuffers(opts.traces)
-		if buffers != nil {
+		traces, _ := makeTraces(opts.traces)
+		if traces != nil {
 			// infinite loop if loop is set to true; it expects a SIGINT/SIGTERM to be stopped
 			for {
-				sendTraces(client, buffers)
+				sendTraces(client, traces)
 				if !opts.loop {
 					break
 				}
