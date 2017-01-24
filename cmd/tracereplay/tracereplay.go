@@ -91,6 +91,7 @@ func sendTraces(client *http.Client, payloads [][]model.Trace) error {
 		var err error
 		for j, trace := range payload {
 			for k, span := range trace {
+				// We need to tweak the span start time else agent rejects it
 				span.Start = time.Now().UTC().UnixNano() - span.Duration
 				trace[k] = span
 			}

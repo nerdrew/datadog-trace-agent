@@ -37,7 +37,13 @@ func main() {
 		// generate the trace
 		traces := []model.Trace{}
 		for i := 0; i < *tracesNumber; i++ {
-			traces = append(traces, fixtures.RandomTrace(10, 8))
+			trace := fixtures.RandomTrace(10, 8)
+			for j, span := range trace {
+				// We need to tweak the span start time else agent rejects it
+				span.Start = time.Now().UTC().UnixNano() - span.Duration
+				trace[j] = span
+			}
+			traces = append(traces, trace)
 		}
 
 		// flood the agent
