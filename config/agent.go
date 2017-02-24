@@ -127,7 +127,7 @@ func NewDefaultAgentConfig() *AgentConfig {
 		ExtraAggregators: []string{},
 
 		ExtraSampleRate: 1.0,
-		MaxTPS:          10,
+		MaxTPS:          10000000,
 
 		ReceiverHost:    "localhost",
 		ReceiverPort:    8126,
