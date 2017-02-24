@@ -126,7 +126,7 @@ func NewDefaultAgentConfig() *AgentConfig {
 		BucketInterval:   time.Duration(10) * time.Second,
 		ExtraAggregators: []string{},
 
-		ExtraSampleRate: 1.0,
+		ExtraSampleRate: 0.1,
 		MaxTPS:          10000000,
 
 		ReceiverHost:    "localhost",
