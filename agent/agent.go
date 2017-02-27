@@ -176,7 +176,12 @@ func (a *Agent) watchdog() {
 	es := publishEndpointStats().(endpointStats)
 	in := float64(rs.TracesReceived) / 60
 	out := float64(es.TracesCount) / 60
-	log.Infof("watchdog in=%f TPS out=%f TPS CPU.UserAvg=%f Mem.AllocsPerSec=%f", in, out, wi.CPU.UserAvg, wi.Mem.AllocPerSec)
+	log.Infof("========================================================================================")
+	log.Infof("watchdog extraRate=%f preRate=%f in=%f TPS out=%f TPS CPU.UserAvg=%f Mem.AllocsPerSec=%f",
+		a.conf.ExtraSampleRate, a.Receiver.PreSampleRate(),
+		in, out,
+		wi.CPU.UserAvg, wi.Mem.AllocPerSec)
+	log.Infof("========================================================================================")
 
 	updateWatchdogInfo(wi)
 }
