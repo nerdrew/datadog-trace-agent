@@ -79,7 +79,7 @@ func NewHTTPReceiver(conf *config.AgentConfig) *HTTPReceiver {
 		logger:   &errorLogger{},
 		exit:     make(chan struct{}),
 
-		preSampleRate:        0.1,
+		preSampleRate:        0.01,
 		maxRequestBodyLength: maxRequestBodyLength,
 		debug:                strings.ToLower(conf.LogLevel) == "debug",
 	}
