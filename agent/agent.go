@@ -172,5 +172,11 @@ func (a *Agent) watchdog() {
 		a.die("exceeded max connections (current=%d, max=%d)", wi.Net.Connections, a.conf.MaxConnections)
 	}
 
+	rs := publishReceiverStats().(receiverStats)
+	es := publishEndpointStats().(endpointStats)
+	in := float64(rs.TracesReceived) / 60
+	out := float64(es.TracesCount) / 60
+	log.Infof("watchdog in=%f TPS out=%f TPS CPU.UserAvg=%f Mem.AllocsPerSec=%f", in, out, wi.CPU.UserAvg, wi.Mem.AllocPerSec)
+
 	updateWatchdogInfo(wi)
 }
