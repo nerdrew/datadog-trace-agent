@@ -130,7 +130,7 @@ func NewDefaultAgentConfig() *AgentConfig {
 
 		ExtraSampleRate: 1.0,
 		PreSampleRate:   1.0,
-		MaxTPS:          10000000,
+		MaxTPS:          10,
 
 		ReceiverHost:    "localhost",
 		ReceiverPort:    8126,
@@ -142,8 +142,8 @@ func NewDefaultAgentConfig() *AgentConfig {
 		LogLevel:    "INFO",
 		LogFilePath: "/var/log/datadog/trace-agent.log",
 
-		MaxMemory:        1e9,
-		MaxCPU:           0.05,
+		MaxMemory:        1e9, // 1 Gb
+		MaxCPU:           0.5, // 50 %
 		MaxConnections:   5000,
 		WatchdogInterval: time.Duration(1) * time.Minute,
 	}
