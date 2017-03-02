@@ -165,6 +165,8 @@ func (a *Agent) Process(t model.Trace) {
 	go a.Sampler.Add(pt)
 }
 
+var watchdogCount int
+
 func (a *Agent) watchdog() {
 	var wi watchdog.Info
 	wi.CPU = watchdog.CPU()
@@ -186,6 +188,21 @@ func (a *Agent) watchdog() {
 		rate = a.conf.PreSampleRate
 	}
 	a.Receiver.preSampler.SetRate(rate)
+
+	if watchdogCount > 0 { // skip display the first time, the numbers are wrong (need warm up)
+		rs := publishReceiverStats().(receiverStats)
+		es := publishEndpointStats().(endpointStats)
+		in := float64(rs.TracesReceived) / 60
+		out := float64(es.TracesCount) / 60
+		log.Infof("========================================================================================")
+		log.Infof("watchdog: %d   extraRate: %f   preRate: %f   CPU.UserAvg: %f   Mem.AllocsPerSec: %f   in: %f TPS   out: %f TPS",
+			watchdogCount,
+			a.conf.ExtraSampleRate, rate,
+			wi.CPU.UserAvg, wi.Mem.AllocPerSec,
+			in, out)
+		log.Infof("========================================================================================")
+	}
+	watchdogCount++
 
 	updatePreSamplerStats(*a.Receiver.preSampler.Stats())
 }
