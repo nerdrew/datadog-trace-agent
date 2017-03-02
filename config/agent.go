@@ -141,7 +141,7 @@ func NewDefaultAgentConfig() *AgentConfig {
 
 		MaxMemory:        1e9,
 		MaxConnections:   5000,
-		WatchdogInterval: time.Duration(1) * time.Minute,
+		WatchdogInterval: time.Minute,
 	}
 
 	return ac
