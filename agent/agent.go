@@ -8,6 +8,7 @@ import (
 	"github.com/DataDog/datadog-trace-agent/config"
 	"github.com/DataDog/datadog-trace-agent/model"
 	"github.com/DataDog/datadog-trace-agent/quantizer"
+	"github.com/DataDog/datadog-trace-agent/sampler"
 	log "github.com/cihub/seelog"
 )
 
@@ -123,7 +124,10 @@ func (a *Agent) Process(t model.Trace) {
 		return
 	}
 
-	root.ApplyRate(a.Receiver.preSampler.Rate()) // sampling rate is on root span only
+	rate := sampler.GetTraceAppliedSampleRate(root)
+	rate *= a.Receiver.preSampler.Rate()
+	sampler.SetTraceAppliedSampleRate(root, rate)
+
 	sublayers := model.ComputeSublayers(&t)
 	model.SetSublayersOnSpan(root, sublayers)
 
