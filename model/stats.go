@@ -1,6 +1,7 @@
 package model
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/DataDog/datadog-trace-agent/quantile"
@@ -137,4 +138,24 @@ func NewStatsBucket(ts, d int64) StatsBucket {
 // IsEmpty just says if this stats bucket has no information (in which case it's useless)
 func (sb StatsBucket) IsEmpty() bool {
 	return len(sb.Counts) == 0 && len(sb.Distributions) == 0
+}
+
+func (sb StatsBucket) String() string {
+	var b bytes.Buffer
+
+	header := fmt.Sprintf("StatsBucket[start:%d,duration%d]", sb.Start, sb.Duration)
+	b.WriteString(header)
+	b.WriteRune('\n')
+
+	for k, v := range sb.Counts {
+		b.WriteString(fmt.Sprintf("Count:%s %s", k, v.Key))
+		b.WriteRune('\n')
+	}
+
+	for k, v := range sb.Distributions {
+		b.WriteString(fmt.Sprintf("Distribution:%s %s", k, v.Key))
+		b.WriteRune('\n')
+	}
+
+	return b.String()
 }

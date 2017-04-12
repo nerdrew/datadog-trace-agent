@@ -73,6 +73,7 @@ func (c *Concentrator) Flush() []model.StatsBucket {
 		}
 
 		log.Debugf("flushing bucket %d", ts)
+		log.Debugf("bucket contents: +%v", bucket)
 		for _, d := range bucket.Distributions {
 			statsd.Client.Histogram("datadog.trace_agent.distribution.len", float64(d.Summary.N), nil, 1)
 		}

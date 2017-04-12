@@ -170,6 +170,7 @@ func (sb *StatsRawBucket) HandleSpan(s Span, env string, aggregators []string, w
 
 	m := make(map[string]string)
 
+	// separate default aggregators from custom ones
 	for _, agg := range aggregators {
 		if agg != "env" && agg != "resource" && agg != "service" {
 			if v, ok := s.Meta[agg]; ok {
