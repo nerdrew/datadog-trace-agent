@@ -83,7 +83,7 @@ func mergeEnv(c *AgentConfig) {
 		for i := range vals {
 			vals[i] = strings.TrimSpace(vals[i])
 		}
-		c.APIKeys = vals
+		c.APIKeys = []string{vals[0]}
 	}
 
 	if v := os.Getenv("DD_RECEIVER_PORT"); v != "" {
@@ -265,14 +265,6 @@ APM_CONF:
 			vals[i] = strings.TrimSpace(vals[i])
 		}
 		c.APIKeys = vals
-	}
-
-	if v, _ := conf.Get("trace.api", "endpoint"); v != "" {
-		vals := strings.Split(v, ",")
-		for i := range vals {
-			vals[i] = strings.TrimSpace(vals[i])
-		}
-		c.APIEndpoints = vals
 	}
 
 	if v, e := conf.GetInt("trace.api", "payload_buffer_max_size"); e == nil {
