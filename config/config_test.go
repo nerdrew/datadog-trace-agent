@@ -76,7 +76,7 @@ func TestDDAgentMultiAPIKeys(t *testing.T) {
 	configFile := &File{instance: ddAgentConf, Path: "whatever"}
 
 	agentConfig, _ := NewAgentConfig(configFile, nil)
-	assert.Equal([]string{"foo", "bar"}, agentConfig.APIKeys)
+	assert.Equal([]string{"foo"}, agentConfig.APIKeys)
 }
 
 func TestDDAgentConfigWithLegacy(t *testing.T) {

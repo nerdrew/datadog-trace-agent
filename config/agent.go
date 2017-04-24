@@ -202,7 +202,7 @@ func NewAgentConfig(conf *File, legacyConf *File) (*AgentConfig, error) {
 		}
 
 		if v := m.Key("api_key").Strings(","); len(v) != 0 {
-			c.APIKeys = v
+			c.APIKeys = []string{v[0]}
 		} else {
 			log.Info("Failed to parse api_key from dd-agent config")
 		}
