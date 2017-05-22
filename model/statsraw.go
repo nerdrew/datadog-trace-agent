@@ -89,49 +89,49 @@ func (sb *StatsRawBucket) Export() StatsBucket {
 	for k, v := range sb.data {
 		hitsKey := GrainKey(k.name, HITS, k.aggr)
 		ret.Counts[hitsKey] = Count{
-			Key:      hitsKey,
-			Name:     k.name,
-			Measure:  HITS,
-			TagSet:   v.tags,
-			TopLevel: v.topLevel,
-			Value:    float64(v.hits),
+			Key:     hitsKey,
+			Name:    k.name,
+			Measure: HITS,
+			TagSet:  v.tags,
+			//			TopLevel: v.topLevel,
+			Value: float64(v.hits),
 		}
 		errorsKey := GrainKey(k.name, ERRORS, k.aggr)
 		ret.Counts[errorsKey] = Count{
-			Key:      errorsKey,
-			Name:     k.name,
-			Measure:  ERRORS,
-			TagSet:   v.tags,
-			TopLevel: v.topLevel,
-			Value:    float64(v.errors),
+			Key:     errorsKey,
+			Name:    k.name,
+			Measure: ERRORS,
+			TagSet:  v.tags,
+			//			TopLevel: v.topLevel,
+			Value: float64(v.errors),
 		}
 		durationKey := GrainKey(k.name, DURATION, k.aggr)
 		ret.Counts[durationKey] = Count{
-			Key:      durationKey,
-			Name:     k.name,
-			Measure:  DURATION,
-			TagSet:   v.tags,
-			TopLevel: v.topLevel,
-			Value:    float64(v.duration),
+			Key:     durationKey,
+			Name:    k.name,
+			Measure: DURATION,
+			TagSet:  v.tags,
+			//			TopLevel: v.topLevel,
+			Value: float64(v.duration),
 		}
 		ret.Distributions[durationKey] = Distribution{
-			Key:      durationKey,
-			Name:     k.name,
-			Measure:  DURATION,
-			TagSet:   v.tags,
-			TopLevel: v.topLevel,
-			Summary:  v.durationDistribution,
+			Key:     durationKey,
+			Name:    k.name,
+			Measure: DURATION,
+			TagSet:  v.tags,
+			//			TopLevel: v.topLevel,
+			Summary: v.durationDistribution,
 		}
 	}
 	for k, v := range sb.sublayerData {
 		key := GrainKey(k.name, k.measure, k.aggr)
 		ret.Counts[key] = Count{
-			Key:      key,
-			Name:     k.name,
-			Measure:  k.measure,
-			TagSet:   v.tags,
-			TopLevel: v.topLevel,
-			Value:    float64(v.value),
+			Key:     key,
+			Name:    k.name,
+			Measure: k.measure,
+			TagSet:  v.tags,
+			//			TopLevel: v.topLevel,
+			Value: float64(v.value),
 		}
 	}
 	return ret
