@@ -55,10 +55,6 @@ type APIEndpoint struct {
 // of URL (such as https://trace.agent.datadoghq.com) and API
 // keys
 func NewAPIEndpoint(url, apiKey string) *APIEndpoint {
-	if apiKey == "" {
-		panic(fmt.Errorf("No API key"))
-	}
-
 	ae := APIEndpoint{
 		apiKey: apiKey,
 		url:    url,
