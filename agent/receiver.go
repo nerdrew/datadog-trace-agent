@@ -210,7 +210,12 @@ func (r *HTTPReceiver) handleTraces(v APIVersion, w http.ResponseWriter, req *ht
 			atomic.AddInt64(&ts.TracesDropped, 1)
 			atomic.AddInt64(&ts.SpansDropped, int64(spans))
 
-			errorMsg := fmt.Sprintf("dropping trace reason: %s (debug for more info), %v", err, normTrace)
+			errorMsg := ""
+			if r.debug {
+				errorMsg = fmt.Sprintf("dropping trace reason: %s (debug for more info), %#v", err, normTrace)
+			} else {
+				errorMsg = fmt.Sprintf("dropping trace reason: %s (debug for more info), %v", err, normTrace)
+			}
 
 			// avoid truncation in DEBUG mode
 			if len(errorMsg) > 150 && !r.debug {

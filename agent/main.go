@@ -13,8 +13,9 @@ import (
 	"syscall"
 	"time"
 
-	log "github.com/cihub/seelog"
 	_ "net/http/pprof"
+
+	log "github.com/cihub/seelog"
 
 	"github.com/DataDog/datadog-trace-agent/config"
 	"github.com/DataDog/datadog-trace-agent/statsd"
@@ -207,7 +208,7 @@ func main() {
 	if !agentConf.LogThrottlingEnabled {
 		duration = 0
 	}
-	err = SetupLogger(logLevel, agentConf.LogFilePath, duration, 10)
+	err = SetupLogger(logLevel, agentConf.LogFilePath, duration, 10, agentConf.LogMaxRolls)
 	if err != nil {
 		die("cannot create logger: %v", err)
 	}

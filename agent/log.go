@@ -20,7 +20,7 @@ const agentLoggerConfigFmt = `
     </filter>
     <filter levels="trace,debug,info,critical">
       <console />
-      <rollingfile type="size" filename="%[4]s" maxsize="10000000" maxrolls="5" />
+      <rollingfile type="size" filename="%[4]s" maxsize="10000000" maxrolls="%[5]d" />
     </filter>
   </outputs>
   <formats>
@@ -194,7 +194,7 @@ func (r *ThrottledReceiver) Close() error {
 //   "logsDropMaxPerInterval" number of messages are showed. The
 //   counter is reset every "logsDropInterval". If "logsDropInterval"
 //   is 0, dropping is disabled (and might flood your logs!).
-func SetupLogger(minLogLvl log.LogLevel, logFilePath string, logsDropInterval time.Duration, logsDropMaxPerInterval int) error {
+func SetupLogger(minLogLvl log.LogLevel, logFilePath string, logsDropInterval time.Duration, logsDropMaxPerInterval int, maxRolls int) error {
 	log.RegisterReceiver("throttled", &ThrottledReceiver{})
 
 	// Build our config string
@@ -204,6 +204,7 @@ func SetupLogger(minLogLvl log.LogLevel, logFilePath string, logsDropInterval ti
 		logsDropInterval,
 		logsDropMaxPerInterval,
 		logFilePath,
+		maxRolls,
 	)
 
 	logger, err := log.LoggerFromConfigAsString(config)

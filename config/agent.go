@@ -56,6 +56,7 @@ type AgentConfig struct {
 	LogLevel             string
 	LogFilePath          string
 	LogThrottlingEnabled bool
+	LogMaxRolls          int
 
 	// watchdog
 	MaxMemory        float64       // MaxMemory is the threshold (bytes allocated) above which program panics and exits, to be restarted
@@ -184,6 +185,7 @@ func NewDefaultAgentConfig() *AgentConfig {
 		LogLevel:             "INFO",
 		LogFilePath:          "/var/log/datadog/trace-agent.log",
 		LogThrottlingEnabled: true,
+		LogMaxRolls:          5,
 
 		MaxMemory:        5e8, // 500 Mb, should rarely go above 50 Mb
 		MaxCPU:           0.5, // 50%, well behaving agents keep below 5%
@@ -271,6 +273,10 @@ APM_CONF:
 
 	if v, _ := conf.Get("trace.config", "log_file"); v != "" {
 		c.LogFilePath = v
+	}
+
+	if v, e := conf.GetInt("trace.config", "log_max_rolls"); e == nil {
+		c.LogMaxRolls = v
 	}
 
 	if v, e := conf.GetStrArray("trace.ignore", "resource", ','); e == nil {
